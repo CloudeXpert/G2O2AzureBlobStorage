@@ -8,35 +8,35 @@
 
     public static class G2OAlgorithms
     {
-        public static string ComputeSignatureValue(int version, string key, string data, string signstring)
+        public static string ComputeSignatureValue(int version, string key, string data, string urlpath)
         {
             if (version < 1 || 5 < version) { throw new ArgumentException(string.Format("Cannot find signature algorithm for version {0}", version)); }
 
             byte[] keyBytes = key.EncodedAsASCII();
             byte[] dataBytes = data.EncodedAsASCII();
-            byte[] signstringBytes = signstring.EncodedAsASCII();
+            byte[] urlpathBytes = urlpath.EncodedAsASCII();
 
             SignAlgorithm algorithm = algorithms[version];
-            byte[] signatureBytes = algorithm(keyBytes, dataBytes, signstringBytes);
-            
+            byte[] signatureBytes = algorithm(keyBytes, dataBytes, urlpathBytes);
+
             string signature = Convert.ToBase64String(signatureBytes);
             return signature;
         }
 
         private static readonly ReadOnlyDictionary<int, SignAlgorithm> algorithms = new ReadOnlyDictionary<int, SignAlgorithm>(new Dictionary<int, SignAlgorithm>
-            {
-                //{ 1, (key, data, signstring) => MD5(msg: new[] { key, data, signstring }) },
-                //{ 2, (key, data, signstring) => MD5(msg: new[] { key, MD5(new[] { key, data, signstring }) }) },
-                //{ 3, (key, data, signstring) => HMAC_Sign(alg: "HMACMD5", key: key, msg: new[] { data, signstring }) },
-                //{ 4, (key, data, signstring) => HMAC_Sign(alg: "HMACSHA1", key: key, msg: new[] { data, signstring }) },
-                //{ 5, (key, data, signstring) => HMAC_Sign(alg: "HMACSHA256", key: key, msg: new[] { data, signstring }) }
+        {
+            //{ 1, (key, data, urlpath) => MD5(msg: new[] { key, data, urlpath }) },
+            //{ 2, (key, data, urlpath) => MD5(msg: new[] { key, MD5(new[] { key, data, urlpath }) }) },
+            //{ 3, (key, data, urlpath) => HMAC_Sign(alg: "HMACMD5", key: key, msg: new[] { data, urlpath }) },
+            //{ 4, (key, data, urlpath) => HMAC_Sign(alg: "HMACSHA1", key: key, msg: new[] { data, urlpath }) },
+            //{ 5, (key, data, urlpath) => HMAC_Sign(alg: "HMACSHA256", key: key, msg: new[] { data, urlpath }) }
 
-                { 1, (key, data, signstring) => MD5(key, data, signstring) },
-                { 2, (key, data, signstring) => MD5(key, MD5(key, data, signstring)) },
-                { 3, (key, data, signstring) => HMAC_Sign("HMACMD5", key, data, signstring) },
-                { 4, (key, data, signstring) => HMAC_Sign("HMACSHA1", key, data, signstring) },
-                { 5, (key, data, signstring) => HMAC_Sign("HMACSHA256", key, data, signstring) }
-            });
+            { 1, (key, data, urlpath) => MD5(key, data, urlpath) },
+            { 2, (key, data, urlpath) => MD5(key, MD5(key, data, urlpath)) },
+            { 3, (key, data, urlpath) => HMAC_Sign("HMACMD5", key, data, urlpath) },
+            { 4, (key, data, urlpath) => HMAC_Sign("HMACSHA1", key, data, urlpath) },
+            { 5, (key, data, urlpath) => HMAC_Sign("HMACSHA256", key, data, urlpath) }
+        });
 
         private static byte[] EncodedAsASCII(this string str)
         {
